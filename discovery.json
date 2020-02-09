@@ -1,9 +1,8 @@
 {
     "botman/driver-config": [
-        "stubs/botframework.php"
+        "stubs/messengerpeople.php"
     ],
     "botman/driver": [
-        "BotMan\\Drivers\\BotFramework\\BotFrameworkDriver",
-        "BotMan\\Drivers\\BotFramework\\BotFrameworkImageDriver"
+        "BotMan\\Drivers\\MessengerPeople\\MessengerPeopleDriver"
     ]
 }

@@ -9,6 +9,7 @@ use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use BotMan\BotMan\Users\User;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +36,7 @@ class MessengerPeopleDriver extends HttpDriver
      */
     public function matchesRequest()
     {
-        return (!is_null($this->event->get('messenger_id')));
+        return ($this->event->get('messenger_id') || $this->event->get('challenge'));
     }
 
     /**
@@ -112,6 +113,15 @@ class MessengerPeopleDriver extends HttpDriver
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
+        $challenge = $this->event->get('challenge');
+
+        if ($challenge && $this->event->get('verification_token')) {
+            return [
+                "success"   => true,
+                "challenge" => $challenge,
+            ];
+        }
+
         $recipient = $matchingMessage->getRecipient();
         if ($recipient === '' || is_null($recipient)) {
             $recipient = $this->config->get('id');
@@ -145,13 +155,17 @@ class MessengerPeopleDriver extends HttpDriver
      */
     public function sendPayload($payload)
     {
+        if (!isset($payload['payload'])) {
+            return JsonResponse::create($payload)->send();
+        }
+
         $headers = [
             'Content-Type:application/vnd.messengerpeople.v1+json',
             'Accept:application/vnd.messengerpeople.v1+json',
             'Authorization:Bearer ' . $this->getAccessToken(),
         ];
 
-        return $this->http->post(API_URL . '/messages', [], $payload, $headers, true);
+        return $this->http->post(self::API_URL . '/messages', [], $payload, $headers, true);
     }
 
     /**
@@ -178,6 +192,6 @@ class MessengerPeopleDriver extends HttpDriver
             'Authorization:Bearer ' . $this->getAccessToken(),
         ];
 
-        return $this->http->post(API_URL . '/' . $endpoint, [], $parameters, $headers, true);
+        return $this->http->post(self::API_URL . '/' . $endpoint, [], $parameters, $headers, true);
     }
 }

@@ -43,7 +43,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "BotMan\\Drivers\\BotFramework\\Providers\\BotFrameworkServiceProvider"
+                "BotMan\\Drivers\\MessengerPeople\\Providers\\MessengerPeopleServiceProvider"
             ]
         }
     }
