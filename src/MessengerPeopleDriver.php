@@ -3,6 +3,7 @@
 namespace BotMan\Drivers\MessengerPeople;
 
 use BotMan\BotMan\Drivers\HttpDriver;
+use BotMan\BotMan\Interfaces\VerifiesService;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MessengerPeopleDriver extends HttpDriver
+class MessengerPeopleDriver extends HttpDriver implements VerifiesService
 {
     const DRIVER_NAME = 'MessengerPeople';
     const API_URL     = 'https://api.messengerpeople.dev';
@@ -106,6 +107,21 @@ class MessengerPeopleDriver extends HttpDriver
     }
 
     /**
+     * @param Request $request
+     * @return null|Response
+     */
+    public function verifyRequest(Request $request)
+    {
+        $payload = Collection::make(json_decode($request->getContent(), true));
+        if ($payload->get('challenge') && $payload->get('verification_token')) {
+            return JsonResponse::create([
+                "success"   => true,
+                "challenge" => $payload->get('challenge'),
+            ])->send();
+        }
+    }
+
+    /**
      * @param string|Question|IncomingMessage $message
      * @param IncomingMessage $matchingMessage
      * @param array $additionalParameters
@@ -113,15 +129,6 @@ class MessengerPeopleDriver extends HttpDriver
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
-        $challenge = $this->event->get('challenge');
-
-        if ($challenge && $this->event->get('verification_token')) {
-            return [
-                "success"   => true,
-                "challenge" => $challenge,
-            ];
-        }
-
         $recipient = $matchingMessage->getRecipient();
         if ($recipient === '' || is_null($recipient)) {
             $recipient = $this->config->get('id');
@@ -155,10 +162,6 @@ class MessengerPeopleDriver extends HttpDriver
      */
     public function sendPayload($payload)
     {
-        if (!isset($payload['payload'])) {
-            return JsonResponse::create($payload)->send();
-        }
-
         $headers = [
             'Content-Type:application/vnd.messengerpeople.v1+json',
             'Accept:application/vnd.messengerpeople.v1+json',
