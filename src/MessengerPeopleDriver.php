@@ -147,6 +147,8 @@ class MessengerPeopleDriver extends HttpDriver implements VerifiesService
             $payload['text'] = $message->getText();
         } elseif ($message instanceof OutgoingMessage) {
             $payload['text'] = $message->getText();
+        } else if (\is_array($message)) {
+            $payload = array_merge_recursive($message, $additionalParameters);
         } else {
             $payload['text'] = $message;
         }
