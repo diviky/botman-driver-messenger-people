@@ -10,7 +10,7 @@ return [
     | WhatsApp Channel UUID
     |
      */
-    'numer_id'      => env('MP_NUMBER_ID'),
+    'number_id'     => env('MP_NUMBER_ID'),
 
     /*
     |--------------------------------------------------------------------------

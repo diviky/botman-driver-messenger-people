@@ -37,7 +37,8 @@ class MessengerPeopleDriver extends HttpDriver implements VerifiesService
      */
     public function matchesRequest()
     {
-        return ($this->event->get('messenger_id') || $this->event->get('challenge'));
+        return (($this->event->get('messenger_id') && $this->event->get('outgoing') === false)
+            || $this->event->get('challenge'));
     }
 
     /**
@@ -58,7 +59,7 @@ class MessengerPeopleDriver extends HttpDriver implements VerifiesService
     {
         return [
             new IncomingMessage(
-                $this->event->get('playload')['text'],
+                $this->event->get('payload')['text'],
                 $this->event->get('sender'),
                 $this->event->get('recipient'),
                 $this->payload
@@ -94,7 +95,7 @@ class MessengerPeopleDriver extends HttpDriver implements VerifiesService
 
     public function getAccessToken()
     {
-        $response = $this->http->post('https://auth.messengerpeople.dev', [], [
+        $response = $this->http->post('https://auth.messengerpeople.dev/token', [], [
             'client_id'     => $this->config->get('client_id'),
             'client_secret' => $this->config->get('client_secret'),
             'grant_type'    => 'client_credentials',
@@ -131,7 +132,7 @@ class MessengerPeopleDriver extends HttpDriver implements VerifiesService
     {
         $recipient = $matchingMessage->getRecipient();
         if ($recipient === '' || is_null($recipient)) {
-            $recipient = $this->config->get('id');
+            $recipient = $this->config->get('number_id');
         }
 
         $payload = array_merge_recursive([
