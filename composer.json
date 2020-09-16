@@ -1,9 +1,9 @@
 {
-  "name": "sankar/botman-driver-messenger-people",
+  "name": "diviky/botman-driver-messenger-people",
   "license": "MIT",
   "description": "Messager People Whatsapp Bot Framework driver for BotMan",
   "keywords": ["Bot", "BotMan", "BotFramework", "Bot Framework"],
-  "homepage": "http://github.com/sankarsuda/driver-messenger-people",
+  "homepage": "http://github.com/sankarsuda/botman-driver-messenger-people",
   "authors": [
     {
       "name": "Sankar Suda",
