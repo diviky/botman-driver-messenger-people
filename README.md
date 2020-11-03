@@ -5,7 +5,7 @@
 You can install the package via composer:
 
 ```bash
-composer require sankar/botman-driver-messenger-people
+composer require diviky/botman-driver-messenger-people
 ```
 
 ## Contributing
